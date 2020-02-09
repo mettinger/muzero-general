@@ -65,6 +65,18 @@ class MuZero:
             os.path.join(self.config.results_path, self.game_name + "_summary")
         )
 
+
+        serialFlag = False
+        if serialFlag:
+            # SERIAL FOR DEBUGGING...
+            shared_storage_worker = shared_storage.SharedStorage.remote(
+                copy.deepcopy(self.muzero_weights), self.game_name, self.config,
+            )
+            replay_buffer_worker = replay_buffer.ReplayBuffer.remote(self.config)
+            self_play_worker = self_play.SelfPlay(copy.deepcopy(self.muzero_weights), self.Game(self.config.seed), self.config)    
+            self_play_worker.continuous_self_play(shared_storage_worker, replay_buffer_worker)    
+            # END SERIAL
+
         # Initialize workers
         training_worker = trainer.Trainer.options(
             num_gpus=1 if "cuda" in self.config.training_device else 0
@@ -73,6 +85,8 @@ class MuZero:
             copy.deepcopy(self.muzero_weights), self.game_name, self.config,
         )
         replay_buffer_worker = replay_buffer.ReplayBuffer.remote(self.config)
+
+
         self_play_workers = [
             self_play.SelfPlay.remote(
                 copy.deepcopy(self.muzero_weights),
@@ -168,7 +182,15 @@ class MuZero:
 
 
 if __name__ == "__main__":
-    muzero = MuZero("cartpole")
+
+    gameChoice = 1
+
+    if gameChoice == 0:
+        muzero = MuZero("cartpole")
+    elif gameChoice == 1:
+        muzero = MuZero("nim")
+
+
     muzero.train()
 
     muzero.load_model()

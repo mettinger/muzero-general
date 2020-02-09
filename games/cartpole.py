@@ -80,7 +80,7 @@ class Game:
     Game wrapper.
     """
 
-    def __init__(self, seed=None):
+    def __init__(self, seed=None, config=None):
         self.env = gym.make("CartPole-v1")
         if seed is not None:
             self.env.seed(seed)

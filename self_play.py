@@ -76,6 +76,9 @@ class SelfPlay:
                     False if temperature == 0 else True,
                 )
 
+                if len(self.game.board) == 1:
+                    placeholder = 1
+
                 action = select_action(root, temperature)
 
                 observation, reward, done = self.game.step(action)
